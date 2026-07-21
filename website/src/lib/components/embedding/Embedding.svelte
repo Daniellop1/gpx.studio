@@ -21,6 +21,7 @@
     import { selection } from '$lib/logic/selection';
     import { untrack } from 'svelte';
     import { isSelected, toggle } from '$lib/components/map/layer-control/utils';
+    import { boundsManager } from '$lib/logic/bounds';
 
     let {
         useHash = true,
@@ -90,6 +91,7 @@
             fileStateCollection.setEmbeddedFiles(files);
             $fileOrder = ids;
             selection.selectAll();
+            boundsManager.fitBoundsOnLoad(ids);
         });
     }
 
