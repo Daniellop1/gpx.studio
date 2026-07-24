@@ -1,10 +1,12 @@
 import { distance, type Coordinates, TrackPoint, TrackSegment, Track, projectedPoint } from 'gpx';
 import { get, writable, type Readable } from 'svelte/store';
-import maplibregl, {
+import {
     type MapMouseEvent,
     type GeoJSONSource,
     type MapLayerMouseEvent,
     type MapLayerTouchEvent,
+    Popup,
+    Point,
 } from 'maplibre-gl';
 import { route } from './routing';
 import { toast } from 'svelte-sonner';
@@ -50,7 +52,7 @@ export class RoutingControls {
         }
     > = new Map();
     anchors: GeoJSON.Feature<GeoJSON.Point, AnchorProperties>[] = [];
-    popup: maplibregl.Popup;
+    popup: Popup;
     popupElement: HTMLElement;
     fileUnsubscribe: () => void = () => {};
     unsubscribes: Function[] = [];
@@ -61,7 +63,7 @@ export class RoutingControls {
 
     draggedAnchorIndex: number | null = null;
     lastDraggedAnchorEventTime: number = 0;
-    draggingStartingPosition: maplibregl.Point = new maplibregl.Point(0, 0);
+    draggingStartingPosition: Point = new Point(0, 0);
     onMouseEnterBinded: () => void = this.onMouseEnter.bind(this);
     onMouseLeaveBinded: () => void = this.onMouseLeave.bind(this);
     onClickBinded: (e: MapLayerMouseEvent) => void = this.onClick.bind(this);
@@ -80,7 +82,7 @@ export class RoutingControls {
     constructor(
         fileId: string,
         file: Readable<GPXFileWithStatistics | undefined>,
-        popup: maplibregl.Popup,
+        popup: Popup,
         popupElement: HTMLElement
     ) {
         this.fileId = fileId;
@@ -183,7 +185,7 @@ export class RoutingControls {
 
         this.layers.forEach((layer, zoom) => {
             try {
-                let source = map_.getSource(layer.id) as maplibregl.GeoJSONSource | undefined;
+                let source = map_.getSource(layer.id) as GeoJSONSource | undefined;
                 if (source) {
                     source.setData({
                         type: 'FeatureCollection',
@@ -520,7 +522,7 @@ export class RoutingControls {
         });
     }
 
-    async appendAnchor(e: maplibregl.MapMouseEvent) {
+    async appendAnchor(e: MapMouseEvent) {
         // Add a new anchor to the end of the last segment
         if (get(streetViewEnabled) && get(streetViewSource) === 'google') {
             return;
@@ -609,7 +611,7 @@ export class RoutingControls {
         await this.routeBetweenAnchors([lastAnchor, newAnchor], [lastAnchorPoint, newAnchorPoint]);
     }
 
-    addIntermediateAnchor(e: maplibregl.MapMouseEvent) {
+    addIntermediateAnchor(e: MapMouseEvent) {
         e.preventDefault();
 
         if (this.temporaryAnchor !== null) {

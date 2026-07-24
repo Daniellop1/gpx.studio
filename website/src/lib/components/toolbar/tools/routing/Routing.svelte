@@ -41,6 +41,7 @@
     import { fileActions, getFileIds, newGPXFile } from '$lib/logic/file-actions';
     import { mapCursor, MapCursorState } from '$lib/logic/map-cursor';
     import { RoutingControls, routingControls } from './routing-controls';
+    import type { Popup } from 'maplibre-gl';
 
     let {
         minimized = $bindable(false),
@@ -51,7 +52,7 @@
     }: {
         minimized?: boolean;
         minimizable?: boolean;
-        popup?: maplibregl.Popup;
+        popup?: Popup;
         popupElement?: HTMLDivElement;
         class?: string;
     } = $props();

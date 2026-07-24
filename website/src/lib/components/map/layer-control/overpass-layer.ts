@@ -6,7 +6,7 @@ import { overpassQueryData } from '$lib/assets/layers';
 import { MapPopup } from '$lib/components/map/map-popup';
 import { settings } from '$lib/logic/settings';
 import { db } from '$lib/db';
-import type { GeoJSONSource } from 'maplibre-gl';
+import type { Map as MapLibreMap, GeoJSONSource } from 'maplibre-gl';
 import { ANCHOR_LAYER_KEY } from '$lib/components/map/style';
 import type { MapLayerEventManager } from '$lib/components/map/map-layer-event-manager';
 import { loadSVGIcon } from '$lib/utils';
@@ -28,7 +28,7 @@ export class OverpassLayer {
     minZoom = 12;
     queryZoom = 12;
     expirationTime = 7 * 24 * 3600 * 1000;
-    map: maplibregl.Map;
+    map: MapLibreMap;
     layerEventManager: MapLayerEventManager;
     popup: MapPopup;
 
@@ -40,7 +40,7 @@ export class OverpassLayer {
     updateBinded = this.update.bind(this);
     onHoverBinded = this.onHover.bind(this);
 
-    constructor(map: maplibregl.Map, layerEventManager: MapLayerEventManager) {
+    constructor(map: MapLibreMap, layerEventManager: MapLayerEventManager) {
         this.map = map;
         this.layerEventManager = layerEventManager;
         this.popup = new MapPopup(map, {
