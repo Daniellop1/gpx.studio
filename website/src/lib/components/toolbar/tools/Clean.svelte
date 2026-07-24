@@ -16,7 +16,7 @@
     import { getURLForLanguage } from '$lib/utils';
     import { Trash2 } from '@lucide/svelte';
     import { map } from '$lib/components/map/map';
-    import type { GeoJSONSource } from 'maplibre-gl';
+    import type { GeoJSONSource, LngLat } from 'maplibre-gl';
     import { selection } from '$lib/logic/selection';
     import { fileActions } from '$lib/logic/file-actions';
     import { mapCursor, MapCursorState } from '$lib/logic/map-cursor';
@@ -29,7 +29,7 @@
     let cleanType = $state(CleanType.INSIDE);
     let deleteTrackpoints = $state(true);
     let deleteWaypoints = $state(true);
-    let rectangleCoordinates: maplibregl.LngLat[] = $state([]);
+    let rectangleCoordinates: LngLat[] = $state([]);
 
     $effect(() => {
         if ($map) {

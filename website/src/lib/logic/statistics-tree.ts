@@ -1,16 +1,16 @@
 import { ListItem, ListLevel } from '$lib/components/file-list/file-list';
 import { GPXFile, GPXStatistics, GPXStatisticsGroup, type Track } from 'gpx';
-import maplibregl from 'maplibre-gl';
+import { LngLatBounds } from 'maplibre-gl';
 
 export class GPXStatisticsTree {
     level: ListLevel;
     statistics: {
         [key: string]: GPXStatisticsTree | GPXStatistics;
     } = {};
-    wptBounds: maplibregl.LngLatBounds;
+    wptBounds: LngLatBounds;
 
     constructor(element: GPXFile | Track) {
-        this.wptBounds = new maplibregl.LngLatBounds();
+        this.wptBounds = new LngLatBounds();
         if (element instanceof GPXFile) {
             this.level = ListLevel.FILE;
             element.children.forEach((child, index) => {
@@ -49,11 +49,11 @@ export class GPXStatisticsTree {
         return statistics;
     }
 
-    intersectsBBox(bounds: maplibregl.LngLatBounds): boolean {
+    intersectsBBox(bounds: LngLatBounds): boolean {
         for (let key in this.statistics) {
             const stats = this.statistics[key];
             if (stats instanceof GPXStatistics) {
-                const bbox = new maplibregl.LngLatBounds(
+                const bbox = new LngLatBounds(
                     stats.global.bounds.southWest,
                     stats.global.bounds.northEast
                 );
@@ -67,7 +67,7 @@ export class GPXStatisticsTree {
         return false;
     }
 
-    intersectsWaypointBBox(bounds: maplibregl.LngLatBounds): boolean {
+    intersectsWaypointBBox(bounds: LngLatBounds): boolean {
         return !this.wptBounds.isEmpty() && this.wptBounds.intersects(bounds);
     }
 }

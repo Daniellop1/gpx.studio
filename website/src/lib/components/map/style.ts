@@ -9,11 +9,17 @@ import {
 } from '$lib/assets/layers';
 import { getLayers } from '$lib/components/map/layer-control/utils';
 import { i18n } from '$lib/i18n.svelte';
+import type {
+    Map,
+    GeoJSONSourceSpecification,
+    LayerSpecification,
+    StyleSpecification,
+} from 'maplibre-gl';
 
 const { currentBasemap, currentOverlays, customLayers, opacities, terrainSource, distanceUnits } =
     settings;
 
-const emptySource: maplibregl.GeoJSONSourceSpecification = {
+const emptySource: GeoJSONSourceSpecification = {
     type: 'geojson',
     data: {
         type: 'FeatureCollection',
@@ -32,18 +38,18 @@ export const ANCHOR_LAYER_KEY = {
     waypoints: 'waypoints-end',
     routingControls: 'routing-controls-end',
 };
-const anchorLayers: maplibregl.LayerSpecification[] = Object.values(ANCHOR_LAYER_KEY).map((id) => ({
+const anchorLayers: LayerSpecification[] = Object.values(ANCHOR_LAYER_KEY).map((id) => ({
     id: id,
     type: 'symbol',
     source: 'empty-source',
 }));
 
 export class StyleManager {
-    private _map: Writable<maplibregl.Map | null>;
+    private _map: Writable<Map | null>;
     private _maptilerKey: string;
     private _pastOverlays: Set<string> = new Set();
 
-    constructor(map: Writable<maplibregl.Map | null>, maptilerKey: string) {
+    constructor(map: Writable<Map | null>, maptilerKey: string) {
         this._map = map;
         this._maptilerKey = maptilerKey;
         this._map.subscribe((map_) => {
@@ -76,10 +82,10 @@ export class StyleManager {
         });
     }
 
-    async buildStyle(basemap: string): Promise<maplibregl.StyleSpecification> {
+    async buildStyle(basemap: string): Promise<StyleSpecification> {
         const custom = get(customLayers);
 
-        const style: maplibregl.StyleSpecification = {
+        const style: StyleSpecification = {
             version: 8,
             projection: {
                 type: 'globe',
@@ -92,7 +98,7 @@ export class StyleManager {
 
         const basemapInfo = basemaps[basemap] ?? custom[basemap]?.value ?? basemaps[defaultBasemap];
 
-        let basemapStyle = basemaps.openStreetMap as maplibregl.StyleSpecification;
+        let basemapStyle = basemaps.openStreetMap as StyleSpecification;
         try {
             basemapStyle = await this.get(basemapInfo);
             for (const source in basemapStyle.sources) {
@@ -203,9 +209,7 @@ export class StyleManager {
         }
     }
 
-    async get(
-        styleInfo: maplibregl.StyleSpecification | string
-    ): Promise<maplibregl.StyleSpecification> {
+    async get(styleInfo: StyleSpecification | string): Promise<StyleSpecification> {
         if (typeof styleInfo === 'string') {
             let styleUrl = styleInfo as string;
             const response = await fetch(styleUrl, { cache: 'force-cache' });
@@ -219,7 +223,7 @@ export class StyleManager {
         }
     }
 
-    merge(style: maplibregl.StyleSpecification, other: maplibregl.StyleSpecification) {
+    merge(style: StyleSpecification, other: StyleSpecification) {
         style.sources = { ...style.sources, ...other.sources };
         const units = get(distanceUnits);
         for (let layer of other.layers ?? []) {

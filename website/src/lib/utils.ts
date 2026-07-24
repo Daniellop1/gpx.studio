@@ -3,7 +3,7 @@ import { twMerge } from 'tailwind-merge';
 import { base } from '$app/paths';
 import { languages } from '$lib/languages';
 import { TrackPoint, Waypoint, type Coordinates, crossarcDistance, distance, GPXFile } from 'gpx';
-import maplibregl from 'maplibre-gl';
+import { Map as MapLibreMap, LngLatBounds } from 'maplibre-gl';
 import { pointToTile, pointToTileFraction } from '@mapbox/tilebelt';
 import type { GPXStatisticsTree } from '$lib/logic/statistics-tree';
 import { ListTrackSegmentItem } from '$lib/components/file-list/file-list';
@@ -58,7 +58,7 @@ export function getClosestTrackSegments(
         let segmentBounds = segmentStatistics.global.bounds;
         let northEast = segmentBounds.northEast;
         let southWest = segmentBounds.southWest;
-        let bounds = new maplibregl.LngLatBounds(southWest, northEast);
+        let bounds = new LngLatBounds(southWest, northEast);
         if (bounds.contains(point)) {
             segmentBoundsDistances.push([0, trackIndex, segmentIndex]);
         } else {
@@ -106,7 +106,7 @@ export function getElevation(
     let coordinates = points.map((point) =>
         point instanceof TrackPoint || point instanceof Waypoint ? point.getCoordinates() : point
     );
-    let bbox = new maplibregl.LngLatBounds();
+    let bbox = new LngLatBounds();
     coordinates.forEach((coord) => bbox.extend(coord));
 
     let tiles = coordinates.map((coord) => pointToTile(coord.lon, coord.lat, ELEVATION_ZOOM));
@@ -193,7 +193,7 @@ export function getElevation(
     );
 }
 
-export function loadSVGIcon(map: maplibregl.Map, id: string, svg: string, size: number = 100) {
+export function loadSVGIcon(map: MapLibreMap, id: string, svg: string, size: number = 100) {
     if (!map.hasImage(id)) {
         let icon = new Image(size, size);
         icon.onload = () => {
